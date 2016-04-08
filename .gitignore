@@ -1,0 +1,6 @@
+.DS_Store
+*.gem
+gems
+*notes.*
+*scratch.*
+todo.md
