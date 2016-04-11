@@ -18,7 +18,7 @@ context "Process host integration" do
     end
   end
 
-  context "Process" do
+  context "Starting the consumer" do
     test "Starts the subscription" do
       dispatched = false
 
