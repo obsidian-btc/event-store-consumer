@@ -2,42 +2,49 @@ module EventStore
   class Consumer
     dependency :dispatcher, Messaging::Dispatcher
     dependency :logger, Telemetry::Logger
+    dependency :write_position, Position::Write
     dependency :session, Client::HTTP
     dependency :subscription, Messaging::Subscription
 
+    setting :position_update_interval
+
     def self.build(stream_name, dispatcher_class)
-      instance = new
+      Build.(stream_name, dispatcher_class)
+    end
 
-      session = EventStore::Client::HTTP::Session.configure instance
+    def start(&supplementary_action)
+      observe_dispatcher
+      start_subscription(&supplementary_action)
+    end
 
-      dispatcher = dispatcher_class.configure instance
+    def observe_dispatcher
+      dispatcher.dispatched do |_, event_data|
+        position = event_data.number
 
-      Messaging::Subscription.configure(
-        instance,
-        stream_name,
-        dispatcher,
-        :attr_name => :subscription,
-        :session => session
-      )
+        write_position.(position) if update_position? position
+      end
+    end
 
-      Telemetry::Logger.configure instance
+    def start_subscription(&supplementary_action)
+      loop do
+        logger.trace "Starting subscription (Stream Name: #{subscription.stream_name.inspect})"
 
-      instance
+        subscription.start &supplementary_action
+
+        logger.debug "Subscription stopped (Stream Name: #{subscription.stream_name.inspect})"
+      end
+    end
+
+    def update_position?(position)
+      return false if position_update_interval.nil?
+
+      cycle = position % position_update_interval
+      cycle.zero?
     end
 
     module ProcessHostIntegration
       def change_connection_scheduler(scheduler)
         session.connection.scheduler = scheduler
-      end
-
-      def start(&supplementary_action)
-        loop do
-          logger.trace "Starting subscription (Stream Name: #{subscription.stream_name.inspect})"
-
-          subscription.start &supplementary_action
-
-          logger.debug "Subscription stopped (Stream Name: #{subscription.stream_name.inspect})"
-        end
       end
     end
   end
