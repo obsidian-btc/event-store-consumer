@@ -17,4 +17,6 @@ require 'test_bench'; TestBench.activate
 
 require 'event_store/consumer/controls'
 
+require 'process_host'
+
 Telemetry::Logger::AdHoc.activate
