@@ -37,11 +37,12 @@ module EventStore
 
           if update_position? position
             write.(position)
+            wrote_position = true
           end
 
           logger.debug "Recorded position (Position: #{position}, Stream: #{write.stream_name.inspect})"
 
-          position
+          wrote_position
         end
 
         def update_position?(position)
