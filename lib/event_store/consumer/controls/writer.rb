@@ -12,7 +12,7 @@ module EventStore
           Messaging::Controls::Writer.write(
             count,
             stream_name,
-            :stream_metadata => stream_metadata
+            stream_metadata: stream_metadata
           )
         end
       end

@@ -41,7 +41,7 @@ module EventStore
 
         configure_subscription dispatcher, session
 
-        Position::Write.configure receiver, stream_name, :session => session
+        Position::Write.configure receiver, stream_name, session: session
 
         logger.trace "Built consumer (Stream Name: #{stream_name.inspect}, Dispatcher Type: #{dispatcher_class.name})"
 
@@ -49,15 +49,15 @@ module EventStore
       end
 
       def configure_subscription(dispatcher, session)
-        position = Position::Read.(stream_name, :session => session)
+        position = Position::Read.(stream_name, session: session)
 
         Messaging::Subscription.configure(
           receiver,
           stream_name,
           dispatcher,
-          :attr_name => :subscription,
-          :session => session,
-          :starting_position => position
+          attr_name: :subscription,
+          session: session,
+          starting_position: position
         )
       end
     end

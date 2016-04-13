@@ -2,13 +2,19 @@ module EventStore
   class Consumer
     module Position
       class Read
+        attr_reader :stream_name
+
         dependency :logger, Telemetry::Logger
-        dependency :stream_metadata, Client::HTTP::StreamMetadata
+        dependency :read_stream_metadata, Client::HTTP::StreamMetadata::Read
+
+        def initialize(stream_name)
+          @stream_name = stream_name
+        end
 
         def self.build(stream_name, session: nil)
-          instance = new
+          instance = new stream_name
 
-          Client::HTTP::StreamMetadata.configure instance, stream_name, :session => session
+          Client::HTTP::StreamMetadata::Read.configure instance, stream_name, session: session
           Telemetry::Logger.configure instance
 
           instance
@@ -22,14 +28,15 @@ module EventStore
         def self.configure(receiver, stream_name, attr_name: nil, session: nil)
           attr_name ||= :read_position
 
-          instance = build stream_name, :session => session
+          instance = build stream_name, session: session
           receiver.public_send "#{attr_name}=", instance
           instance
         end
 
         def call
-          logger.trace "Retrieving stream position (Stream Name: #{stream_metadata.stream_name.inspect})"
-          metadata = stream_metadata.get
+          logger.trace "Retrieving stream position (Stream Name: #{stream_name.inspect})"
+
+          metadata = read_stream_metadata.()
 
           if metadata.nil?
             position = 0
@@ -37,7 +44,7 @@ module EventStore
             position = metadata[:consumer_position].to_i
           end
 
-          logger.debug "Retrieved stream position (Stream Name: #{stream_metadata.stream_name.inspect}, Position: #{position})"
+          logger.debug "Retrieved stream position (Stream Name: #{stream_name.inspect}, Position: #{position})"
 
           position
         end

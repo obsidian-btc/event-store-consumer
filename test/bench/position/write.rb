@@ -25,7 +25,7 @@ context "Writing the current stream position" do
     end
 
     context "Specific attribute name" do
-      EventStore::Consumer::Position::Write.configure receiver, stream_name, :attr_name => :some_attr
+      EventStore::Consumer::Position::Write.configure receiver, stream_name, attr_name: :some_attr
 
       test "The receiver has an instance of a position writer" do
         assert receiver.some_attr.is_a?(EventStore::Consumer::Position::Write)

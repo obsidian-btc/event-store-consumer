@@ -3,7 +3,7 @@ require_relative '../bench_init'
 context "Reading the current stream position" do
   context "Consumer has previously written position state" do
     control_position = EventStore::Consumer::Controls::Position.example
-    stream_name = EventStore::Consumer::Controls::Writer.write :position => control_position
+    stream_name = EventStore::Consumer::Controls::Writer.write position: control_position
 
     position = EventStore::Consumer::Position::Read.(stream_name)
 
@@ -43,7 +43,7 @@ context "Reading the current stream position" do
     end
 
     context "Specific attribute name" do
-      EventStore::Consumer::Position::Read.configure receiver, stream_name, :attr_name => :some_attr
+      EventStore::Consumer::Position::Read.configure receiver, stream_name, attr_name: :some_attr
 
       test "The receiver has an instance of a position reader" do
         assert receiver.some_attr.is_a?(EventStore::Consumer::Position::Read)

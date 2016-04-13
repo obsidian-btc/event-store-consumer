@@ -42,7 +42,7 @@ context "Building a consumer" do
 
   context "Current stream position is in the middle" do
     control_position = EventStore::Consumer::Controls::Position.example
-    EventStore::Consumer::Controls::Writer.write stream_name, :position => control_position
+    EventStore::Consumer::Controls::Writer.write stream_name, position: control_position
 
     consumer = EventStore::Consumer::Build.(stream_name, dispatcher_class)
 

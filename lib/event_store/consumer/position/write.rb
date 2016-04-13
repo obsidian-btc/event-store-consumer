@@ -2,13 +2,19 @@ module EventStore
   class Consumer
     module Position
       class Write
+        attr_reader :stream_name
+
         dependency :logger, Telemetry::Logger
-        dependency :stream_metadata, Client::HTTP::StreamMetadata
+        dependency :update_stream_metadata, Client::HTTP::StreamMetadata::Update
+
+        def initialize(stream_name)
+          @stream_name = stream_name
+        end
 
         def self.build(stream_name, session: nil)
-          instance = new
+          instance = new stream_name
 
-          Client::HTTP::StreamMetadata.configure instance, stream_name, :session => session
+          Client::HTTP::StreamMetadata::Update.configure instance, stream_name, session: session
           Telemetry::Logger.configure instance
 
           instance
@@ -22,19 +28,19 @@ module EventStore
         def self.configure(receiver, stream_name, attr_name: nil, session: nil)
           attr_name ||= :write_position
 
-          instance = build stream_name, :session => session
+          instance = build stream_name, session: session
           receiver.public_send "#{attr_name}=", instance
           instance
         end
 
         def call(position)
-          logger.trace "Updating stream position (Stream Name: #{stream_metadata.stream_name.inspect}, Position: #{position})"
+          logger.trace "Updating stream position (Stream Name: #{stream_name.inspect}, Position: #{position})"
 
-          stream_metadata.update do |metadata|
+          update_stream_metadata.() do |metadata|
             metadata[:consumer_position] = position
           end
 
-          logger.debug "Updated stream position (Stream Name: #{stream_metadata.stream_name.inspect}, Position: #{position})"
+          logger.debug "Updated stream position (Stream Name: #{stream_name.inspect}, Position: #{position})"
 
           position
         end
