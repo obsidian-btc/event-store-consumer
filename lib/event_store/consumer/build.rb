@@ -37,11 +37,10 @@ module EventStore
 
         session = EventStore::Client::HTTP::Session.configure receiver
 
-        Settings.set receiver
-
         configure_subscription dispatcher, session
 
-        Position::Write.configure receiver, stream_name, session: session
+        update_interval = Settings.get :position_update_interval
+        Position::Record.configure receiver, stream_name, update_interval, session: session
 
         logger.trace "Built consumer (Stream Name: #{stream_name.inspect}, Dispatcher Type: #{dispatcher_class.name})"
 

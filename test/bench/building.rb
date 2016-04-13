@@ -15,8 +15,8 @@ context "Building a consumer" do
       assert consumer.logger.is_a?(Telemetry::Logger::ConsoleLogger)
     end
 
-    test "Configures a position writer" do
-      assert consumer.write_position.is_a?(EventStore::Consumer::Position::Write)
+    test "Configures a position recorder" do
+      assert consumer.record_position.is_a?(EventStore::Consumer::Position::Record)
     end
 
     test "Configures an event store client session" do
@@ -25,10 +25,6 @@ context "Building a consumer" do
 
     test "Configures a subscription" do
       assert consumer.subscription.class == EventStore::Messaging::Subscription
-    end
-
-    test "Position update interval setting is set" do
-      assert consumer.position_update_interval.is_a?(Integer)
     end
   end
 

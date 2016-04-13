@@ -9,6 +9,10 @@ module EventStore
         @instance ||= build
       end
 
+      def self.get(setting)
+        instance.get setting
+      end
+
       def self.set(receiver)
         instance.set receiver
       end
