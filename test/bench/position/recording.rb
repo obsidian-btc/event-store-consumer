@@ -8,7 +8,7 @@ context "Periodically recording the stream position" do
   record_position = EventStore::Consumer::Position::Record.build stream_name, update_interval
 
   context "The stream position is at the beginning" do
-    event_data = EventStore::Consumer::Controls::EventData::Read.example 0
+    event_data = EventStore::Consumer::Controls::EventData::Read.example position: 0
 
     wrote_position = record_position.(event_data)
 
@@ -19,7 +19,7 @@ context "Periodically recording the stream position" do
 
   context "The stream position is divisible by the update interval" do
     position = update_interval * 2
-    event_data = EventStore::Consumer::Controls::EventData::Read.example position
+    event_data = EventStore::Consumer::Controls::EventData::Read.example position: position
 
     wrote_position = record_position.(event_data)
 
@@ -30,7 +30,7 @@ context "Periodically recording the stream position" do
 
   context "The stream position is not divisible by the update interval" do
     position = update_interval + 1
-    event_data = EventStore::Consumer::Controls::EventData::Read.example position
+    event_data = EventStore::Consumer::Controls::EventData::Read.example position: position
 
     wrote_position = record_position.(event_data)
 

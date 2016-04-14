@@ -31,7 +31,7 @@ module EventStore
         end
 
         def call(event_data)
-          position = event_data.number
+          position = event_data.position
 
           logger.trace "Recording position (Position: #{position}, Stream: #{write.stream_name.inspect})"
 
