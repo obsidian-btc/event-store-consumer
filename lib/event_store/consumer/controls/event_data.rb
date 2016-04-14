@@ -4,9 +4,7 @@ module EventStore
       module EventData
         module Read
           def self.example(number=nil)
-            json = Client::HTTP::Controls::EventData::Read::JSON.text number
-
-            Client::HTTP::EventData::Read.parse json
+            Client::HTTP::Controls::EventData::Read.example number
           end
         end
       end
