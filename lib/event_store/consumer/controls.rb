@@ -1,5 +1,6 @@
 require 'event_store/messaging/controls'
 
+require 'event_store/consumer/controls/category_name'
 require 'event_store/consumer/controls/dispatcher'
 require 'event_store/consumer/controls/event_data'
 require 'event_store/consumer/controls/position/stream_metadata'

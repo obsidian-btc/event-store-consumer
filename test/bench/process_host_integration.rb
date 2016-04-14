@@ -3,8 +3,12 @@ require_relative './bench_init'
 context "Process host integration" do
   dispatcher_class = EventStore::Consumer::Controls::Dispatcher::SomeDispatcher
   stream_name = EventStore::Consumer::Controls::Writer.write
+  category_name = EventStore::Messaging::StreamName.get_category stream_name
+  # FIXME - This should not be necessary
+  category_name.gsub! /^\$ce-/, ''
+  # /FIXME
 
-  consumer = EventStore::Consumer.build stream_name, dispatcher_class
+  consumer = EventStore::Consumer.build category_name, dispatcher_class
 
   ProcessHost.integrate consumer
 

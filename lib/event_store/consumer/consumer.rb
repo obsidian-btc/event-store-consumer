@@ -1,13 +1,19 @@
 module EventStore
   class Consumer
+    attr_reader :category_name
+
     dependency :dispatcher, Messaging::Dispatcher
     dependency :logger, Telemetry::Logger
     dependency :record_position, Position::Record
     dependency :session, Client::HTTP
     dependency :subscription, Messaging::Subscription
 
-    def self.build(stream_name, dispatcher_class)
-      Build.(stream_name, dispatcher_class)
+    def initialize(category_name)
+      @category_name = category_name
+    end
+
+    def self.build(category_name, dispatcher_class)
+      Build.(category_name, dispatcher_class)
     end
 
     def start(&supplementary_action)
@@ -23,11 +29,11 @@ module EventStore
 
     def start_subscription(&supplementary_action)
       loop do
-        logger.trace "Starting subscription (Stream Name: #{subscription.stream_name.inspect})"
+        logger.trace "Starting subscription (Category: #{category_name.inspect})"
 
         subscription.start &supplementary_action
 
-        logger.debug "Subscription stopped (Stream Name: #{subscription.stream_name.inspect})"
+        logger.debug "Subscription stopped (Category: #{category_name.inspect})"
       end
     end
 
