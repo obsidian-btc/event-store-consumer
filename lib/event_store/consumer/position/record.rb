@@ -33,19 +33,16 @@ module EventStore
         def call(event_data)
           position = event_data.position
 
-          logger.trace "Recording position (Position: #{position}, Stream: #{write.stream_name.inspect})"
-
-          if update_position? position
+          if interval? position
             write.(position)
-            wrote_position = true
+
+            true
+          else
+            false
           end
-
-          logger.debug "Recorded position (Position: #{position}, Stream: #{write.stream_name.inspect})"
-
-          wrote_position
         end
 
-        def update_position?(position)
+        def interval?(position)
           cycle = position % update_interval
           cycle.zero?
         end
